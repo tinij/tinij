@@ -1,0 +1,40 @@
+{
+  "name": "tinij-base",
+  "version": "0.1.0",
+  "description": "tinij base npm package",
+  "main": "dist/index.js",
+  "types" : "dist/index.d.ts",
+  "scripts": {
+
+    "test": "mocha -r ts-node/register test/**/test.ts",
+    "start": "node dist/index.js",
+    "watch": "tsc -w",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tinij/tinij.git"
+  },
+  "keywords": [
+    "tinij"
+  ],
+  "author": "Alex Lobanov (aleksgowalker@gmail.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tinij/tinij/issues"
+  },
+  "homepage": "https://github.com/tinij/tinij#readme",
+  "dependencies": {
+    "class-validator" : "^0.12.0-rc.0",
+    "language-detect" : "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^13.9.5",
+    "@types/mocha": "^7.0.2",
+    "@types/chai": "^4.2.11",
+    "typescript": "^3.8.3",
+    "ts-node" : "^8.8.1",
+    "mocha" : "^7.1.1",
+    "chai" : "^4.2.0"
+  }
+}
