@@ -27,6 +27,8 @@ docker-stack.override.yml
 !.vscode/launch.json
 !.vscode/settings.json
 
+.idea
+
 # misc
 .DS_Store
 backup.sql
