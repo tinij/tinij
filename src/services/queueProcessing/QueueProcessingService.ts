@@ -1,5 +1,5 @@
 import {IQueueProcessingService} from "./IQueueProcessingService";
-import {EventType, IMessageBroker, INotifierComponent} from "../IMessageBroker";
+import {EventType, IMessageBroker, INotifierComponent} from "../messageBroker/IMessageBroker";
 import {IQueueService} from "../queue/IQueueService";
 import {IActivityApi} from "../../api/IActivityApi";
 import {ResponseResultEnum} from "../../enums/ResponseResultEnum";
@@ -21,7 +21,7 @@ export class QueueProcessingService implements IQueueProcessingService, INotifie
     async executeProcessingQueue(): Promise<void> {
         let allActivities = await this.queueService.popActiveActivities();
         let result = await this.apiService.trackActivity(allActivities);
-        if (result != ResponseResultEnum.OK) {
+        if (result == ResponseResultEnum.FAILED) {
             await this.queueService.pushActivitiesToQueue(allActivities);
         }
     }

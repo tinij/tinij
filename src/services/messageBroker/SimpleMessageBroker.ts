@@ -1,4 +1,4 @@
-import {logTrace} from "../utils";
+import {logTrace} from "../../utils";
 import {EventType, INotifierComponent, IMessageBroker} from "./IMessageBroker";
 
 export class SimpleMessageBroker implements IMessageBroker{

@@ -5,4 +5,5 @@ export interface IQueueService {
     pushActivityToQueue(activity: ActivityEntity) : Promise<boolean>;
     pushActivitiesToQueue(activity: Array<ActivityEntity>) : Promise<boolean>;
     popActiveActivities() : Promise<Array<ActivityEntity>>;
+    getActiveActivities() : Promise<Array<ActivityEntity>>;
 }

@@ -1,5 +1,6 @@
 export enum ResponseResultEnum {
     OK,
     SKIP,
-    FAILED
+    FAILED,
+    EMPTY
 }

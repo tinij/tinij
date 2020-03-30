@@ -9,13 +9,14 @@ export interface IValidator {
 export class Validator implements IValidator {
     async validateActivityEntity(entity: ActivityEntity): Promise<boolean> {
         let entityDate = entity.time;
-        if (!validateTime(entityDate))
+        if (!validateTime(entityDate)) {
+            logError("Entity date validation failed: " + entityDate);
             return false;
+        }
         let validationResult = await validate(entity);
         if (validationResult == null || validationResult.length == 0)
             return true;
         logError(JSON.stringify(validationResult));
         return false;
     }
-
 }

@@ -1,7 +1,7 @@
 import {IQueueService} from "./IQueueService";
 import {ActivityEntity} from "../../entities/ActivityEntity";
 import {MAX_ACTIVITIES_BEFORE_SEND} from "../../constants";
-import {EventType, IMessageBroker} from "../IMessageBroker";
+import {EventType, IMessageBroker} from "../messageBroker/IMessageBroker";
 
 export class QueueService implements IQueueService {
 
@@ -15,7 +15,7 @@ export class QueueService implements IQueueService {
 
     async popActiveActivities(): Promise<Array<ActivityEntity>> {
         let activeActivities = this.activeQueue;
-        activeActivities = new Array<ActivityEntity>();
+        this.activeQueue = new Array<ActivityEntity>();
         return activeActivities;
     }
 
@@ -40,6 +40,10 @@ export class QueueService implements IQueueService {
             this.activeQueue.push(active);
         }
         return true;
+    }
+
+    async getActiveActivities(): Promise<Array<ActivityEntity>> {
+        return this.activeQueue;
     }
 
 }
