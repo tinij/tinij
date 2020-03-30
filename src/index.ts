@@ -19,6 +19,9 @@ import {MachineInfoService} from "./services/machineInfoService/MachineInfoServi
 import {IFormatterService} from "./services/fomatterService/IFormatterService";
 import {FormatterService} from "./services/fomatterService/FormatterService";
 import {ConfigSingleton} from "./configSingleton";
+import {IProjectService} from "./services/projects/IProjectService";
+import {BaseProjectService} from "./services/projects/BaseProjectService";
+import {CategoryEnum} from "./enums/CategoryEnum";
 
 export class Tinij {
 
@@ -31,6 +34,7 @@ export class Tinij {
     queueProcessingService: IQueueProcessingService;
     machineInfoService: IMachineInfoService;
     formattedService: IFormatterService;
+    projectService: IProjectService;
 
     constructor(apiKey: string) {
         if (apiKey == null)
@@ -48,8 +52,13 @@ export class Tinij {
         this.fileService = new FileService();
         this.machineInfoService = new MachineInfoService();
         this.formattedService = new FormatterService();
-
+        this.projectService = new BaseProjectService();
         this.initModules();
+    }
+
+
+    public getConfig() : ConfigSingleton {
+        return ConfigSingleton.getInstance();
     }
 
     protected async initModules() {
@@ -60,19 +69,22 @@ export class Tinij {
         plugin: string,
         time: number,
         entity: string,
-        category: number,
-        is_write: boolean = false,
-        project: string = null,
-        branch: string = null,
-        lineNumber: number = null
+        category: CategoryEnum = CategoryEnum.CODING,
+        is_write?: boolean,
+        project?: string,
+        branch?: string,
+        lineNumber?: number,
+        type?: number,
     ) {
-        let activityType = this.getActivityType(entity);
+        let activityType = this.getActivityType(entity, type);
         let machineInfo = this.machineInfoService.getMachineInfo();
+        let currentBranch = branch ?? await this.projectService.getBranch(entity);
+
         let activityEntity = new ActivityEntity();
         activityEntity.entity = entity;
         activityEntity.plugin = plugin;
         activityEntity.time = time;
-        activityEntity.branch = branch;
+        activityEntity.branch = currentBranch;
         activityEntity.project = project;
         activityEntity.category = category;
         activityEntity.is_write = is_write;
@@ -93,7 +105,9 @@ export class Tinij {
         await this.queueService.pushActivityToQueue(formattedActivity);
     }
 
-    private getActivityType(entity: string) : HeartbeatsTypeEnum {
+    private getActivityType(entity: string, def: HeartbeatsTypeEnum | undefined) : HeartbeatsTypeEnum {
+        if (def)
+            return def;
         if (entity != null && entity.startsWith("http")) {
            return HeartbeatsTypeEnum.Domain;
         } else {

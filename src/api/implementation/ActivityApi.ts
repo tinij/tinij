@@ -25,7 +25,8 @@ export class ActivityApi implements IActivityApi{
                 headers: {
                     'Content-Type': 'application/json;charset=UTF-8',
                     "Access-Control-Allow-Origin": "*",
-                    "TINIJ-API-KEY": this.config.GetApiKey()
+                    "TINIJ-API-KEY": this.config.GetApiKey(),
+                    "User-Agent": this.config.GetUserAgent()
                 },
             };
             const response = await axios.post(this.config.GetTrackActivityUrl(), requestData, axiosConfig);

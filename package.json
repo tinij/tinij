@@ -1,11 +1,10 @@
 {
   "name": "tinij-base",
-  "version": "0.1.0",
-  "description": "tinij base npm package",
+  "version": "0.1.1",
+  "description": "tinij base package",
   "main": "dist/index.js",
   "types" : "dist/index.d.ts",
   "scripts": {
-
     "test": "mocha -r ts-node/register test/**/test.ts",
     "start": "node dist/index.js",
     "watch": "tsc -w",
@@ -27,9 +26,11 @@
   "dependencies": {
     "class-validator" : "^0.12.0-rc.0",
     "axios": "^0.19.2",
-    "language-detect" : "^1.1.0"
+    "language-detect" : "^1.1.0",
+    "git-branch": "^2.0.1"
   },
   "devDependencies": {
+    "@types/git-branch": "^2.0.1",
     "@types/node": "^13.9.5",
     "@types/axios" : "^0.14.0",
     "@types/mocha": "^7.0.2",

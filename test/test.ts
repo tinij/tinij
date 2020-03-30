@@ -173,6 +173,36 @@ describe('Machine info test',
         });
 });
 
+describe('Git info test',
+    () => {
+        it('should return current branch', async () => {
+            let pluginName = "testPlugin";
+            let entity = "/Users/alexlobanov/Projects/tinij-project/tinij-base/test/test.ts";
+            let category = CategoryEnum.CODING;
+            let writeOperation = false;
+            let project = "testProject";
+            let branch = "testBranch";
+            let lineNumber = 5;
+
+            const tinij = new Tinij("testKey");
+            await tinij.trackActivity(
+                pluginName,
+                new Date().getUTCMilliseconds(),
+                entity,
+                category,
+                writeOperation,
+                project,
+                undefined,
+                lineNumber);
+
+            let popedQueueItems = await tinij.queueService.popActiveActivities();
+            assert.equal(popedQueueItems.length, 1, "Queue should have tracked activity item");
+            let createdObject = popedQueueItems[0];
+            console.log(createdObject.branch);
+        });
+    });
+
+
 /*
 describe('HTTP request test',
     () => {
