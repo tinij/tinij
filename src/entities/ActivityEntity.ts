@@ -1,6 +1,7 @@
 import {HeartbeatsTypeEnum} from "../enums/HeartbeatsTypeEnum";
-import {IsIn, IsInt, IsString, Length, IsNotEmpty, IsEnum} from "class-validator";
+import {IsIn, IsInt, IsString, Length, IsNotEmpty, IsEnum, IsDate, IsNumber, Min, Max} from "class-validator";
 import {CategoryEnum} from "../enums/CategoryEnum";
+import {isNumber} from "util";
 
 export class ActivityEntity {
 
@@ -33,7 +34,9 @@ export class ActivityEntity {
     machine: string;
 
     @IsNotEmpty()
-    @IsInt()
+    @IsNumber()
+    @Min(0)
+    @Max(4102444800)
     time: number;
 
     project: string;

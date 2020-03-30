@@ -31,9 +31,7 @@ describe('Validation test',
         it('should return false for empty activity', async () => {
             const tinij = new Tinij("testKey");
             let activity = new ActivityEntity();
-            activity.time = new Date().getUTCMilliseconds();
-            let result = await tinij.validationService.validateActivityEntity(activity);
-            assert.equal(result, false);
+            activity.time = Date.now();
 
             let pluginName = "testPlugin";
             let entity = "test.ts";
@@ -42,7 +40,23 @@ describe('Validation test',
             let branch = "testBranch";
             let lineNumber = 5;
 
-            activity.time = new Date().getUTCMilliseconds();
+            activity.time = Date.now();
+            activity.system = "MacOS";
+            activity.machine = "testExecutor";
+            activity.plugin = pluginName;
+            activity.entity = entity;
+            activity.category = category;
+            activity.is_write = false;
+            activity.project = project;
+            activity.branch = branch;
+            activity.lineno = lineNumber;
+            activity.type = HeartbeatsTypeEnum.File;
+
+            let invalidDate = await tinij.validationService.validateActivityEntity(activity);
+
+            assert.equal(invalidDate, false);
+
+            activity.time = Date.now() / 1000;
             activity.system = "MacOS";
             activity.machine = "testExecutor";
             activity.plugin = pluginName;
