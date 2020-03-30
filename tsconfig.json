@@ -21,6 +21,7 @@
     "typings",
     "src/types",
     "api-doc",
+    "dist",
     "config",
     "environment",
     "middleware",

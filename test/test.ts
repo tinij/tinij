@@ -173,6 +173,7 @@ describe('Machine info test',
         });
 });
 
+/*
 describe('HTTP request test',
     () => {
         it('should try to send activities to real backend system', async () => {
@@ -202,3 +203,4 @@ describe('HTTP request test',
             assert.equal(empty.length, 0, "Queue should not have tracked activity item - because they was sent already");
         });
     });
+*/
