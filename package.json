@@ -1,6 +1,6 @@
 {
   "name": "tinij-base",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "tinij base package",
   "main": "dist/index.js",
   "types" : "dist/index.d.ts",
@@ -10,6 +10,9 @@
     "watch": "tsc -w",
     "build": "tsc"
   },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tinij/tinij.git"

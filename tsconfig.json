@@ -8,11 +8,13 @@
     "esModuleInterop": true,
     "declaration": true,
     "sourceMap": true,
+    "resolveJsonModule": true,
     "outDir": "dist",
     "typeRoots": ["./node_modules/@types"]
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "src/config.json"
   ],
   "exclude": [
     "node_modules",
@@ -22,7 +24,6 @@
     "src/types",
     "api-doc",
     "dist",
-    "config",
     "environment",
     "middleware",
     "routers",
