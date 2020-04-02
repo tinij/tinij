@@ -1,7 +1,7 @@
 import {IActivityApi} from "../IActivityApi";
 import {ActivityEntity} from "../../entities/ActivityEntity";
 import {ResponseResultEnum} from "../../enums/ResponseResultEnum";
-import {logInfo} from "../../utils";
+import {logInfo, logDetail} from "../../utils";
 import axios, {AxiosRequestConfig} from 'axios';
 import {ConfigSingleton} from "../../configSingleton";
 
@@ -38,6 +38,7 @@ export class ActivityApi implements IActivityApi{
                 return ResponseResultEnum.FAILED;
         }
         catch (e) {
+         logDetail("Request failed: " + e?.errno);
          return ResponseResultEnum.FAILED;
         }
     }

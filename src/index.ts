@@ -9,9 +9,9 @@ import {ActivityEntity} from "./entities/ActivityEntity";
 import {HeartbeatsTypeEnum} from "./enums/HeartbeatsTypeEnum";
 import {IFileService} from "./services/fileService/IFileService";
 import {FileService} from "./services/fileService/FileService";
-import {logError} from "./utils";
+import {logError, logInfo} from "./utils";
 import {SimpleMessageBroker} from "./services/messageBroker/SimpleMessageBroker";
-import {IMessageBroker} from "./services/messageBroker/IMessageBroker";
+import {IMessageBroker, EventType} from "./services/messageBroker/IMessageBroker";
 import {IQueueProcessingService} from "./services/queueProcessing/IQueueProcessingService";
 import {QueueProcessingService} from "./services/queueProcessing/QueueProcessingService";
 import {IMachineInfoService} from "./services/machineInfoService/IMachineInfoService";
@@ -23,8 +23,11 @@ import {IProjectService} from "./services/projects/IProjectService";
 import {BaseProjectService} from "./services/projects/BaseProjectService";
 import {CategoryEnum} from "./enums/CategoryEnum";
 import { PluginTypeEnum } from "./enums/PluginTypeEnum";
+import { QueueFactory } from "./services/queue/QueueFactory";
 
 export class Tinij {
+
+    public isInit = false;
 
     languageDetector: IDetectLanguageService;
     activityApi: IActivityApi;
@@ -44,17 +47,6 @@ export class Tinij {
             return;
         }
         ConfigSingleton.getInstance().SetUserToken(apiKey);
-        this.simpleMessageBroker = new SimpleMessageBroker();
-        this.languageDetector = new DetectLanguageService();
-        this.activityApi = new ActivityApi();
-        this.queueService = new QueueService(this.simpleMessageBroker);
-        this.queueProcessingService = new QueueProcessingService(this.simpleMessageBroker, this.queueService, this.activityApi);
-        this.validationService = new Validator();
-        this.fileService = new FileService();
-        this.machineInfoService = new MachineInfoService();
-        this.formattedService = new FormatterService();
-        this.projectService = new BaseProjectService();
-        this.initModules();
     }
 
 
@@ -62,8 +54,43 @@ export class Tinij {
         return ConfigSingleton.getInstance();
     }
 
+    public async initServices() : Promise<boolean> {
+        try {
+            this.simpleMessageBroker = new SimpleMessageBroker();
+            var factory = new QueueFactory(this.simpleMessageBroker);
+
+            this.languageDetector = new DetectLanguageService();
+            this.activityApi = new ActivityApi();
+            this.validationService = new Validator();
+            this.fileService = new FileService();
+            this.machineInfoService = new MachineInfoService();
+            this.formattedService = new FormatterService();
+            this.projectService = new BaseProjectService();
+
+            this.queueService = await factory.getService();
+            this.queueProcessingService = new QueueProcessingService(this.simpleMessageBroker, this.queueService, this.activityApi);
+
+            await this.queueService.initQueue();
+
+            this.initModules();
+            this.isInit = true;
+
+            return true;
+        } catch (err) {
+            logError("Failed:" + err);
+            return false;
+        }
+    }
+
+    public async clearStoredCache() : Promise<boolean> {
+        let objects = await this.queueService.popActiveActivities();
+        objects = null;
+        return true;
+    }
+
     protected async initModules() {
-        await this.queueService.initQueue();
+        logInfo("Init completed");
+        this.simpleMessageBroker.invokeEvent(EventType.APPLICATION_INIT);
     }
 
     public async trackActivity(
@@ -77,6 +104,11 @@ export class Tinij {
         lineNumber?: number,
         type?: number,
     ) {
+        if (!this.isInit)
+        {
+            logError("Please init the service first");
+            return;
+        }
         let activityType = this.getActivityType(entity, type);
         let machineInfo = this.machineInfoService.getMachineInfo();
         let currentBranch = branch ?? await this.projectService.getBranch(entity);
@@ -110,7 +142,7 @@ export class Tinij {
         if (def)
             return def;
         if (entity != null && entity.startsWith("http")) {
-           return HeartbeatsTypeEnum.Domain;
+            return HeartbeatsTypeEnum.Domain;
         } else {
             return HeartbeatsTypeEnum.File;
         }

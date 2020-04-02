@@ -1,5 +1,9 @@
 {
   "trackActivityURL" : "http://localhost:3501/activity/bulk",
+  "activityLogFile" : "tinij_activity.json",
+  "logFile" : "tinij.log",
+  "debugLevel" : 5,
+  "memoryBasedQueue": false,
   "apiKey": "",
   "enable.notifications": false
 }

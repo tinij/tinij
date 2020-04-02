@@ -13,16 +13,18 @@ import { PlatformTypeEnum } from '../src/enums/PlatformTypeEnum';
 
 describe('Base test',
     () => {
-        it('should return true', () => {
+        it('should return true', async () => {
             const tinij = new Tinij("test");
+            await tinij.initServices();
             assert.isNotNull(tinij);
         });
 });
 
 describe('Language test',
     () => {
-        it('should return JS', () => {
+        it('should return JS', async () => {
             const tinij = new Tinij("test api");
+            await tinij.initServices();
             let language = tinij.languageDetector.detectLanguageByFileName("alex.js");
             assert.equal(language, "JavaScript");
         });
@@ -32,6 +34,9 @@ describe('Validation test',
     () => {
         it('should return false for empty activity', async () => {
             const tinij = new Tinij("testKey");
+
+            await tinij.initServices();
+
             let activity = new ActivityEntity();
             activity.time = new Date();
 
@@ -73,6 +78,8 @@ describe('Activity track test',
             let lineNumber = 5;
 
             const tinij = new Tinij("testKey");
+            await tinij.initServices();
+            await tinij.clearStoredCache();
             await tinij.trackActivity(
                 pluginName,
                 new Date(),
@@ -111,6 +118,8 @@ describe('Activity queue test',
             let lineNumber = 5;
 
             const tinij = new Tinij("testKey");
+            await tinij.initServices();
+            await tinij.clearStoredCache();
             await tinij.trackActivity(
                 pluginName,
                 new Date(),
@@ -142,6 +151,8 @@ describe('Broker event test',
             let lineNumber = 5;
 
             const tinij = new FakeTinij();
+            tinij.initServices();
+            await tinij.clearStoredCache();
             const activitiesRecorded = MAX_ACTIVITIES_BEFORE_SEND;
             for (let i = 0; i < activitiesRecorded; i++) {
                 await tinij.trackActivity(
@@ -167,6 +178,8 @@ describe('Machine info test',
     () => {
         it('should return current operation system and name ', async () => {
             const tinij = new Tinij("testKey");
+            await tinij.initServices();
+            await tinij.clearStoredCache();
             let result = await tinij.machineInfoService.getMachineInfo();
             console.log("Machine Name: " + result.machineName);
             console.log("OS: " +  result.operationSystem);
@@ -185,6 +198,8 @@ describe('Git info test',
             let lineNumber = 5;
 
             const tinij = new Tinij("testKey");
+            await tinij.initServices();
+            await tinij.clearStoredCache();
             await tinij.trackActivity(
                 pluginName,
                 new Date(),
@@ -203,7 +218,7 @@ describe('Git info test',
     });
 
 
-
+/*
 describe('HTTP request test',
     () => {
         it('should try to send activities to real backend system', async () => {
@@ -217,6 +232,8 @@ describe('HTTP request test',
             let lineNumber = 5;
 
             const tinij = new Tinij("test");
+            await tinij.initServices();
+            await tinij.clearStoredCache();
             const activitiesRecorded = MAX_ACTIVITIES_BEFORE_SEND;
             for (let i = 0; i < activitiesRecorded; i++) {
                 await tinij.trackActivity(
@@ -229,8 +246,14 @@ describe('HTTP request test',
                     branch,
                     i);
             }
+
+            await new Promise(resolve =>
+                setTimeout(resolve, 50) // allow time to cleanup
+            );
+
             let empty = await tinij.queueService.getActiveActivities();
             assert.equal(empty.length, 0, "Queue should not have tracked activity item - because they was sent already");
         });
     });
 
+*/

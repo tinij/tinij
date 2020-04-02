@@ -1,4 +1,4 @@
-import {logTrace} from "../../utils";
+import {logTrace, logInfo} from "../../utils";
 import {EventType, INotifierComponent, IMessageBroker} from "./IMessageBroker";
 
 export class SimpleMessageBroker implements IMessageBroker{
@@ -20,7 +20,8 @@ export class SimpleMessageBroker implements IMessageBroker{
         }
     }
 
-    invokeEvent(event: EventType, data: object) {
+    invokeEvent(event: EventType, data?: object) {
+        logInfo("New event: " + EventType[event]);
         if (this.listOfSubscribers == null) {
             logTrace("No subscribers for event: " + event);
             return;

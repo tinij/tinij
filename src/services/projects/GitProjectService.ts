@@ -1,5 +1,6 @@
 import {IProjectService} from "./IProjectService";
 import branch from "git-branch";
+import { logError, logDetail } from "../../utils";
 
 
 export class GitProjectService implements IProjectService {
@@ -10,6 +11,7 @@ export class GitProjectService implements IProjectService {
             return await branch(file)
         }
         catch (e) {
+            logDetail(e);
             return null;
         }
     }

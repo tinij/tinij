@@ -8,12 +8,18 @@ import {FileService} from "../../src/services/fileService/FileService";
 import {MachineInfoService} from "../../src/services/machineInfoService/MachineInfoService";
 import {FormatterService} from "../../src/services/fomatterService/FormatterService";
 import {FakeApiService} from "./FakeApiService";
+import { BaseProjectService } from "../../src/services/projects/BaseProjectService";
+import { QueueFactory } from "../../src/services/queue/QueueFactory";
 
 export class FakeTinij extends Tinij{
 
     constructor() {
         super("testKey");
+        super.isInit = true;
+    }
 
+
+    public async initServices() : Promise<boolean> {
         this.simpleMessageBroker = new SimpleMessageBroker();
         this.languageDetector = new DetectLanguageService();
         this.activityApi = new FakeApiService();
@@ -23,8 +29,13 @@ export class FakeTinij extends Tinij{
         this.fileService = new FileService();
         this.machineInfoService = new MachineInfoService();
         this.formattedService = new FormatterService();
+        this.projectService = new BaseProjectService();
+
+        await this.queueService.initQueue();
 
         this.initModules();
 
+
+        return true;
     }
 }

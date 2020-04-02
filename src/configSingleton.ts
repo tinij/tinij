@@ -25,6 +25,18 @@ export class ConfigSingleton {
         return config.trackActivityURL;
     }
 
+    public GetDebugLevel() : number {
+        return config.debugLevel;
+    }
+
+    public GetActivityFileLocation() : string {
+        return config.activityLogFile;
+    }
+
+    public IsMemoryBasedQueue() : boolean {
+        return config.memoryBasedQueue == "true";
+    }
+
     public SetUserToken(key: string) : void {
         this.userInfo = new UserInfoEntity();
         this.userInfo.apiKey = key;

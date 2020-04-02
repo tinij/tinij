@@ -28,7 +28,7 @@ export class QueueService implements IQueueService {
         this.activeQueue.push(activity);
 
         if (this.activeQueue.length >= MAX_ACTIVITIES_BEFORE_SEND)
-            this.messageBroker.invokeEvent(EventType.QUEUE_MIN_LIMIT_REACHED, this.activeQueue);
+            this.messageBroker.invokeEvent(EventType.QUEUE_MIN_LIMIT_REACHED);
 
         return true;
     }
