@@ -1,5 +1,5 @@
 import {ActivityEntity} from "../entities/ActivityEntity";
-import {logError, validateTime} from "./index";
+import {logError, validateTime, validateDateTime} from "./index";
 import {validate} from "class-validator";
 
 export interface IValidator {
@@ -9,7 +9,7 @@ export interface IValidator {
 export class Validator implements IValidator {
     async validateActivityEntity(entity: ActivityEntity): Promise<boolean> {
         let entityDate = entity.time;
-        if (!validateTime(entityDate)) {
+        if (!validateDateTime(entityDate)) {
             logError("Entity date validation failed: " + entityDate);
             return false;
         }

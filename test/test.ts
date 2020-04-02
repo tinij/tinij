@@ -8,6 +8,8 @@ import {CategoryEnum} from "../src/enums/CategoryEnum";
 import {FakeTinij} from "./fakeMethods/FakeTinij";
 import {FakeApiService} from "./fakeMethods/FakeApiService";
 import {MAX_ACTIVITIES_BEFORE_SEND} from "../src/constants";
+import { PluginTypeEnum } from '../src/enums/PluginTypeEnum';
+import { PlatformTypeEnum } from '../src/enums/PlatformTypeEnum';
 
 describe('Base test',
     () => {
@@ -31,33 +33,17 @@ describe('Validation test',
         it('should return false for empty activity', async () => {
             const tinij = new Tinij("testKey");
             let activity = new ActivityEntity();
-            activity.time = Date.now();
+            activity.time = new Date();
 
-            let pluginName = "testPlugin";
+            let pluginName = PluginTypeEnum.VSCODE;
             let entity = "test.ts";
             let category = CategoryEnum.CODING;
             let project = "testProject";
             let branch = "testBranch";
             let lineNumber = 5;
 
-            activity.time = Date.now();
-            activity.system = "MacOS";
-            activity.machine = "testExecutor";
-            activity.plugin = pluginName;
-            activity.entity = entity;
-            activity.category = category;
-            activity.is_write = false;
-            activity.project = project;
-            activity.branch = branch;
-            activity.lineno = lineNumber;
-            activity.type = HeartbeatsTypeEnum.File;
-
-            let invalidDate = await tinij.validationService.validateActivityEntity(activity);
-
-            assert.equal(invalidDate, false);
-
-            activity.time = Date.now() / 1000;
-            activity.system = "MacOS";
+            activity.time = new Date();
+            activity.system = PlatformTypeEnum.MacOS;
             activity.machine = "testExecutor";
             activity.plugin = pluginName;
             activity.entity = entity;
@@ -78,7 +64,7 @@ describe('Activity track test',
     () => {
         it('should have one activity created', async () => {
 
-            let pluginName = "testPlugin";
+            let pluginName = PluginTypeEnum.VSCODE;
             let entity = "/Users/alexlobanov/Projects/tinij project/tinij-base/test/test.ts";
             let category = CategoryEnum.CODING;
             let writeOperation = false;
@@ -89,7 +75,7 @@ describe('Activity track test',
             const tinij = new Tinij("testKey");
             await tinij.trackActivity(
                 pluginName,
-                new Date().getUTCMilliseconds(),
+                new Date(),
                 entity,
                 category,
                 writeOperation,
@@ -116,7 +102,7 @@ describe('Activity queue test',
     () => {
         it('should have one activity created and removed', async () => {
 
-            let pluginName = "testPlugin";
+            let pluginName = PluginTypeEnum.VSCODE;
             let entity = "/Users/alexlobanov/Projects/tinij project/tinij-base/test/test.ts";
             let category = CategoryEnum.CODING;
             let writeOperation = false;
@@ -127,7 +113,7 @@ describe('Activity queue test',
             const tinij = new Tinij("testKey");
             await tinij.trackActivity(
                 pluginName,
-                new Date().getUTCMilliseconds(),
+                new Date(),
                 entity,
                 category,
                 writeOperation,
@@ -147,7 +133,7 @@ describe('Broker event test',
     () => {
         it('should try to send activities to backend', async () => {
 
-            let pluginName = "testPlugin";
+            let pluginName = PluginTypeEnum.VSCODE;
             let entity = "/Users/alexlobanov/Projects/tinij project/tinij-base/test/test.ts";
             let category = CategoryEnum.CODING;
             let writeOperation = false;
@@ -160,7 +146,7 @@ describe('Broker event test',
             for (let i = 0; i < activitiesRecorded; i++) {
                 await tinij.trackActivity(
                     pluginName,
-                    new Date().getUTCMilliseconds(),
+                    new Date(),
                     entity,
                     category,
                     writeOperation,
@@ -190,7 +176,7 @@ describe('Machine info test',
 describe('Git info test',
     () => {
         it('should return current branch', async () => {
-            let pluginName = "testPlugin";
+            let pluginName = PluginTypeEnum.VSCODE;
             let entity = "/Users/alexlobanov/Projects/tinij-project/tinij-base/test/test.ts";
             let category = CategoryEnum.CODING;
             let writeOperation = false;
@@ -201,7 +187,7 @@ describe('Git info test',
             const tinij = new Tinij("testKey");
             await tinij.trackActivity(
                 pluginName,
-                new Date().getUTCMilliseconds(),
+                new Date(),
                 entity,
                 category,
                 writeOperation,
@@ -217,12 +203,12 @@ describe('Git info test',
     });
 
 
-/*
+
 describe('HTTP request test',
     () => {
         it('should try to send activities to real backend system', async () => {
 
-            let pluginName = "testPlugin";
+            let pluginName = PluginTypeEnum.VSCODE;
             let entity = "/Users/alexlobanov/Projects/tinij project/tinij-base/test/test.ts";
             let category = CategoryEnum.CODING;
             let writeOperation = false;
@@ -235,7 +221,7 @@ describe('HTTP request test',
             for (let i = 0; i < activitiesRecorded; i++) {
                 await tinij.trackActivity(
                     pluginName,
-                    new Date().getUTCMilliseconds(),
+                    new Date(),
                     entity,
                     category,
                     writeOperation,
@@ -247,4 +233,4 @@ describe('HTTP request test',
             assert.equal(empty.length, 0, "Queue should not have tracked activity item - because they was sent already");
         });
     });
-*/
+

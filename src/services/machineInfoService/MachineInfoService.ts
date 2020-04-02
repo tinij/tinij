@@ -1,5 +1,6 @@
 import {IMachineInfoService, MachineInfo} from "./IMachineInfoService";
 import * as os from "os";
+import { PlatformTypeEnum } from "../../enums/PlatformTypeEnum";
 
 export class MachineInfoService implements IMachineInfoService{
     private readonly cachedMachineInfo: MachineInfo;
@@ -17,25 +18,25 @@ export class MachineInfoService implements IMachineInfoService{
 
         switch (operationSystem) {
             case "aix":
-                machineInfo.operationSystem = "Unix";
+                machineInfo.operationSystem = PlatformTypeEnum.Unix;
                 break;
             case "darwin":
-                machineInfo.operationSystem = "MacOS";
+                machineInfo.operationSystem = PlatformTypeEnum.MacOS;
                 break;
             case "freebsd":
-                machineInfo.operationSystem = "FreeBSD";
+                machineInfo.operationSystem = PlatformTypeEnum.FreeBSD;
                 break;
             case "linux":
-                machineInfo.operationSystem = "Linux";
+                machineInfo.operationSystem = PlatformTypeEnum.Linux;
                 break;
             case "openbsd":
-                machineInfo.operationSystem = "OpenBSD";
+                machineInfo.operationSystem = PlatformTypeEnum.OpenBSD;
                 break;
             case "sunos":
-                machineInfo.operationSystem = "Solaris";
+                machineInfo.operationSystem = PlatformTypeEnum.Solaris;
                 break;
             case "win32":
-                machineInfo.operationSystem = "Windows";
+                machineInfo.operationSystem = PlatformTypeEnum.Windows;
                 break;
         }
         return machineInfo;

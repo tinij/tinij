@@ -2,50 +2,50 @@ import {HeartbeatsTypeEnum} from "../enums/HeartbeatsTypeEnum";
 import {IsIn, IsInt, IsString, Length, IsNotEmpty, IsEnum, IsDate, IsNumber, Min, Max} from "class-validator";
 import {CategoryEnum} from "../enums/CategoryEnum";
 import {isNumber} from "util";
+import { PlatformTypeEnum } from "../enums/PlatformTypeEnum";
+import { PluginTypeEnum } from "../enums/PluginTypeEnum";
 
 export class ActivityEntity {
 
-    @IsNotEmpty()
-    @IsString()
-    @Length(1, 255)
-    entity: string;
+  @IsNotEmpty()
+  @IsString()
+  @Length(1, 255)
+  entity: string;
 
-    @IsEnum(HeartbeatsTypeEnum)
-    @IsNotEmpty()
-    type: HeartbeatsTypeEnum;
+  @IsEnum(HeartbeatsTypeEnum)
+  @IsNotEmpty()
+  type: HeartbeatsTypeEnum;
 
-    @IsEnum(CategoryEnum)
-    @IsNotEmpty()
-    category: CategoryEnum;
+  @IsEnum(CategoryEnum)
+  @IsNotEmpty()
+  category: CategoryEnum;
 
-    @IsNotEmpty()
-    @IsString()
-    @Length(1, 60)
-    plugin: string;
+  @IsEnum(PluginTypeEnum)
+  @IsNotEmpty()
+  plugin: PluginTypeEnum;
 
-    @IsNotEmpty()
-    @IsString()
-    @Length(1, 40)
-    system: string;
+  @IsEnum(PlatformTypeEnum)
+  @IsNotEmpty()
+  system: PlatformTypeEnum;
 
-    @IsNotEmpty()
-    @IsString()
-    @Length(1, 255)
-    machine: string;
+  @IsNotEmpty()
+  @IsString()
+  @Length(1, 60)
+  machine: string;
 
-    @IsNotEmpty()
-    @IsNumber()
-    @Min(0)
-    @Max(4102444800)
-    time: number;
+  @IsDate()
+  time: Date;
 
-    project: string;
-    branch: string;
-    language: string;
-    dependencies: string;
-    lines: number;
-    lineno: number;
-    is_write: boolean;
+  @Length(0, 60)
+  project: string;
+
+  branch: string;
+  language: string;
+  dependencies: string;
+  lines: number;
+  lineno: number;
+  is_write: boolean;
+  userId: number;
 
 
 }

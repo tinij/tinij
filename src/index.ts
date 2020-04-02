@@ -22,6 +22,7 @@ import {ConfigSingleton} from "./configSingleton";
 import {IProjectService} from "./services/projects/IProjectService";
 import {BaseProjectService} from "./services/projects/BaseProjectService";
 import {CategoryEnum} from "./enums/CategoryEnum";
+import { PluginTypeEnum } from "./enums/PluginTypeEnum";
 
 export class Tinij {
 
@@ -66,8 +67,8 @@ export class Tinij {
     }
 
     public async trackActivity(
-        plugin: string,
-        time: number,
+        plugin: PluginTypeEnum | number,
+        time: Date | string | number,
         entity: string,
         category: CategoryEnum = CategoryEnum.CODING,
         is_write?: boolean,
@@ -83,7 +84,7 @@ export class Tinij {
         let activityEntity = new ActivityEntity();
         activityEntity.entity = entity;
         activityEntity.plugin = plugin;
-        activityEntity.time = time;
+        activityEntity.time = new Date(time);
         activityEntity.branch = currentBranch;
         activityEntity.project = project;
         activityEntity.category = category;
