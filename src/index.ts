@@ -9,7 +9,7 @@ import {ActivityEntity} from "./entities/ActivityEntity";
 import {HeartbeatsTypeEnum} from "./enums/HeartbeatsTypeEnum";
 import {IFileService} from "./services/fileService/IFileService";
 import {FileService} from "./services/fileService/FileService";
-import {logError, logInfo} from "./utils";
+import {logError, logInfo, InitLogService} from "./utils";
 import {SimpleMessageBroker} from "./services/messageBroker/SimpleMessageBroker";
 import {IMessageBroker, EventType} from "./services/messageBroker/IMessageBroker";
 import {IQueueProcessingService} from "./services/queueProcessing/IQueueProcessingService";
@@ -18,7 +18,7 @@ import {IMachineInfoService} from "./services/machineInfoService/IMachineInfoSer
 import {MachineInfoService} from "./services/machineInfoService/MachineInfoService";
 import {IFormatterService} from "./services/fomatterService/IFormatterService";
 import {FormatterService} from "./services/fomatterService/FormatterService";
-import {ConfigSingleton} from "./configSingleton";
+import {ConfigService} from "./configService";
 import {IProjectService} from "./services/projects/IProjectService";
 import {BaseProjectService} from "./services/projects/BaseProjectService";
 import {CategoryEnum} from "./enums/CategoryEnum";
@@ -28,6 +28,7 @@ import { QueueFactory } from "./services/queue/QueueFactory";
 export class Tinij {
 
     public isInit = false;
+    protected _apiKey = "";
 
     languageDetector: IDetectLanguageService;
     activityApi: IActivityApi;
@@ -43,19 +44,20 @@ export class Tinij {
     constructor(apiKey: string) {
         if (apiKey == null)
         {
-            logError("No API key found. Exit");
+            console.error("[TINI] NO API KEY FOUND! Exit");
             return;
         }
-        ConfigSingleton.getInstance().SetUserToken(apiKey);
+        this._apiKey = apiKey;
     }
 
 
-    public getConfig() : ConfigSingleton {
-        return ConfigSingleton.getInstance();
+    public getConfig() : ConfigService {
+        return ConfigService.getInstance();
     }
 
     public async initServices() : Promise<boolean> {
         try {
+            await this.initMainModules();
             this.simpleMessageBroker = new SimpleMessageBroker();
             var factory = new QueueFactory(this.simpleMessageBroker);
 
@@ -71,7 +73,6 @@ export class Tinij {
             this.queueProcessingService = new QueueProcessingService(this.simpleMessageBroker, this.queueService, this.activityApi);
 
             await this.queueService.initQueue();
-
             this.initModules();
             this.isInit = true;
 
@@ -85,6 +86,13 @@ export class Tinij {
     public async clearStoredCache() : Promise<boolean> {
         let objects = await this.queueService.popActiveActivities();
         objects = null;
+        return true;
+    }
+
+    protected async initMainModules() : Promise<boolean> {
+        await this.getConfig().InitSettingsStorage();
+        ConfigService.getInstance().SetUserToken(this._apiKey);
+        InitLogService();
         return true;
     }
 

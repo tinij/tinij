@@ -15,32 +15,32 @@ export class LockProtectedFileBasedQueueService extends FileBasedQueueService {
     }
 
 
-    async popActiveActivities(): Promise<Array<ActivityEntity>> {
-        return this.lock.acquire("file", () => {
+    popActiveActivities(): Promise<Array<ActivityEntity>> {
+        return this.lock.acquire("file", (done) => {
             return super.popActiveActivities();
         });
     }
 
-    async pushActivityToQueue(activity: ActivityEntity): Promise<boolean> {
+    pushActivityToQueue(activity: ActivityEntity): Promise<boolean> {
         return this.lock.acquire("file", () => {
             return super.pushActivityToQueue(activity);
         });
     }
 
-    async pushActivitiesToQueue(activity: Array<ActivityEntity>): Promise<boolean> {
+    pushActivitiesToQueue(activity: Array<ActivityEntity>): Promise<boolean> {
         return this.lock.acquire("file", () => {
             return super.pushActivitiesToQueue(activity);
         });
     }
 
-    async getActiveActivities(): Promise<Array<ActivityEntity>> {
+    getActiveActivities(): Promise<Array<ActivityEntity>> {
         return this.lock.acquire("file", () => {
             return super.getActiveActivities();
         });
     }
 
-    async initQueue(): Promise<boolean> {
-        return this.initQueue();
+    initQueue(): Promise<boolean> {
+        return super.initQueue();
     }
 
 }

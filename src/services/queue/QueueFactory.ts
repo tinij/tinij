@@ -2,24 +2,25 @@ import { IQueueService } from "./IQueueService";
 import { FileBasedQueueService } from "./FileBasedQueueService";
 import { IMessageBroker } from "../messageBroker/IMessageBroker";
 import { QueueService } from "./QueueService";
-import { ConfigSingleton } from "../../configSingleton";
+import { ConfigService } from "../../configService";
 import fs from "fs";
 import { logError } from "../../utils";
+import { LockProtectedFileBasedQueueService } from "./LockProtectedFileBasedQueueService";
 
 export class QueueFactory {
 
     private readonly fileBasedQueue: IQueueService;
     private readonly memoryBasedQueue: IQueueService;
-    private readonly config: ConfigSingleton;
+    private readonly config: ConfigService;
 
     constructor(messageBroker: IMessageBroker) {
         this.fileBasedQueue = new FileBasedQueueService(messageBroker);
         this.memoryBasedQueue = new QueueService(messageBroker);
-        this.config = ConfigSingleton.getInstance();
+        this.config = ConfigService.getInstance();
     }
 
     async getService() : Promise<IQueueService> {
-        if (this.config.IsMemoryBasedQueue())
+        if (await this.config.IsMemoryBasedQueue())
             return this.memoryBasedQueue;
         var isPossibleToUseFile = await this.initFileSystem();
         return isPossibleToUseFile ? this.fileBasedQueue : this.memoryBasedQueue;

@@ -4,17 +4,17 @@ import {MAX_ACTIVITIES_BEFORE_SEND} from "../../constants";
 import {EventType, IMessageBroker} from "../messageBroker/IMessageBroker";
 import { promises as fsPromises } from 'fs';
 import fs from 'fs';
-import { ConfigSingleton } from "../../configSingleton";
+import { ConfigService } from "../../configService";
 import { logError } from "../../utils";
 import lock from "async-lock";
 export class FileBasedQueueService implements IQueueService {
 
     private readonly messageBroker: IMessageBroker;
-    private readonly config: ConfigSingleton;
+    private readonly config: ConfigService;
 
     constructor(messageBroker: IMessageBroker) {
         this.messageBroker = messageBroker;
-        this.config = ConfigSingleton.getInstance();
+        this.config = ConfigService.getInstance();
     }
 
 

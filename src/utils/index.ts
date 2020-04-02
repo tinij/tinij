@@ -1,36 +1,15 @@
-import { ConfigSingleton } from "../configSingleton";
+import { ConfigService } from "../configService";
 import fs from "fs";
 import util from "util";
 
-var logFile = fs.createWriteStream('debug.log', {flags : 'w'});
+var logFile : fs.WriteStream;
+var logLevel: number;
 
-export const logError = (s: string) => {
-    console.error(s);
-    logFile.write(util.format(s) + '\n');
-};
-
-export const logInfo = (s: string) => {
-    var level = ConfigSingleton.getInstance().GetDebugLevel();
-    if (level <= 1)
-        return;
-    console.log(s);
-    logFile.write(util.format(s) + '\n');
-};
-export const logDetail = (s: string) => {
-    var level = ConfigSingleton.getInstance().GetDebugLevel();
-    if (level <= 2)
-        return;
-    console.log(s);
-    logFile.write(util.format(s) + '\n');
-};
-
-export const logTrace = (s: string) => {
-    var level = ConfigSingleton.getInstance().GetDebugLevel();
-    if (level < 3)
-        return;
-    console.log(s);
-    logFile.write(util.format(s) + '\n');
-};
+export async function InitLogService() : Promise<boolean> {
+    logFile = fs.createWriteStream(ConfigService.getInstance().GetLogFileLocation(), {flags : 'a'});
+    this.logLevel = await ConfigService.getInstance().GetDebugLevel();
+    return true;
+}
 
 export function validateTime(time: number) : boolean {
     return (new Date(time)).getTime() > 0;
@@ -50,19 +29,40 @@ export function validateDateTime(time: Date) : boolean {
     return true;
 }
 
-export const notConcurrent = <T>(proc: () => PromiseLike<T>) => {
-    let inFlight: Promise<T> | false = false;
-  
-    return () => {
-      if (!inFlight) {
-        inFlight = (async () => {
-          try {
-            return await proc();
-          } finally {
-            inFlight = false;
-          }
-        })();
-      }
-      return inFlight;
-    };
-  };
+export const logError = (s: string) => {
+    console.error(s);
+    if (s == undefined || logFile == null) {
+        return;
+    }
+    logFile.write(new Date().toISOString() +  " - [ERROR] " + new Date().toISOString() +  " ]"  + util.format(s) + '\n');
+};
+
+export const logInfo = async (s: string) => {
+    if (logLevel <= 1)
+        return;
+    console.log(s);
+    if (s == undefined || logFile == null) {
+        return;
+    }
+    logFile.write(new Date().toISOString() +  " - [INFO] " + new Date().toISOString() +  "]"  + util.format(s) + '\n');
+};
+export const logDetail = async (s: string) => {
+    if (logLevel <= 2)
+        return;
+    console.log(s);
+    if (s == undefined || logFile == null) {
+        return;
+    }
+    logFile.write(new Date().toISOString() +  " - [DETAIL] " + new Date().toISOString() +  "]" + util.format(s) + '\n');
+};
+
+export const logTrace = async (s: string) => {
+    if (logLevel < 3)
+        return;
+    console.log(s);
+    if (s == undefined || logFile == null) {
+        return;
+    }
+    logFile.write(new Date().toISOString() +  " - [TRACE] " + util.format(s) + '\n');
+};
+

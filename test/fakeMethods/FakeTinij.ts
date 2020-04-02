@@ -20,21 +20,24 @@ export class FakeTinij extends Tinij{
 
 
     public async initServices() : Promise<boolean> {
+        await this.initMainModules();
         this.simpleMessageBroker = new SimpleMessageBroker();
+        var factory = new QueueFactory(this.simpleMessageBroker);
+
         this.languageDetector = new DetectLanguageService();
         this.activityApi = new FakeApiService();
-        this.queueService = new QueueService(this.simpleMessageBroker);
-        this.queueProcessingService = new QueueProcessingService(this.simpleMessageBroker, this.queueService, this.activityApi);
         this.validationService = new Validator();
         this.fileService = new FileService();
         this.machineInfoService = new MachineInfoService();
         this.formattedService = new FormatterService();
         this.projectService = new BaseProjectService();
 
+        this.queueService = await factory.getService();
+        this.queueProcessingService = new QueueProcessingService(this.simpleMessageBroker, this.queueService, this.activityApi);
+
         await this.queueService.initQueue();
-
         this.initModules();
-
+        this.isInit = true;
 
         return true;
     }
