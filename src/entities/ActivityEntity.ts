@@ -36,9 +36,7 @@ export class ActivityEntity {
   @IsDate()
   time: Date;
 
-  @Length(0, 60)
   project: string;
-
   branch: string;
   language: string;
   dependencies: string;
