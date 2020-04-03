@@ -1,5 +1,5 @@
 import {HeartbeatsTypeEnum} from "../enums/HeartbeatsTypeEnum";
-import {IsIn, IsInt, IsString, Length, IsNotEmpty, IsEnum, IsDate, IsNumber, Min, Max} from "class-validator";
+import {IsIn, IsInt, IsString, Length, IsNotEmpty, IsEnum, IsDate, IsNumber, Min, Max, IsOptional, MaxLength} from "class-validator";
 import {CategoryEnum} from "../enums/CategoryEnum";
 import {isNumber} from "util";
 import { PlatformTypeEnum } from "../enums/PlatformTypeEnum";
@@ -36,9 +36,18 @@ export class ActivityEntity {
   @IsDate()
   time: Date;
 
+  @IsOptional()
+  @MaxLength(60)
   project: string;
+
+  @IsOptional()
+  @MaxLength(60)
   branch: string;
+
+  @IsOptional()
+  @MaxLength(40)
   language: string;
+
   dependencies: string;
   lines: number;
   lineno: number;
