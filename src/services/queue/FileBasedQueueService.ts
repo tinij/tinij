@@ -11,6 +11,7 @@ export class FileBasedQueueService implements IQueueService {
 
     private readonly messageBroker: IMessageBroker;
     private readonly config: ConfigService;
+    private lastTrackedActivity: number = 0;
 
     constructor(messageBroker: IMessageBroker) {
         this.messageBroker = messageBroker;
@@ -21,7 +22,7 @@ export class FileBasedQueueService implements IQueueService {
     async popActiveActivities(): Promise<Array<ActivityEntity>> {
         try {
             let queuesRaw = await fsPromises.readFile(this.config.GetActivityFileLocation(), { encoding: "utf8" });
-            await fsPromises.writeFile(this.config.GetActivityFileLocation(), "", { encoding: "utf8" });
+            await fsPromises.writeFile(this.config.GetActivityFileLocation(), "", { encoding: "utf8", flag: "w" });
             if (queuesRaw == null || queuesRaw == "")
                 return new Array<ActivityEntity>();
             let parsedQueue = JSON.parse(queuesRaw) as ActivityEntity[];
@@ -39,13 +40,23 @@ export class FileBasedQueueService implements IQueueService {
         try {
             let currentQueue = await this.getActiveActivities();
             currentQueue.push(activity);
-            await fsPromises.writeFile(this.config.GetActivityFileLocation(), JSON.stringify(currentQueue), { encoding: "utf8" });
-            if (currentQueue.length >= MAX_ACTIVITIES_BEFORE_SEND)
-                this.messageBroker.invokeEvent(EventType.QUEUE_MIN_LIMIT_REACHED);
+            await fsPromises.writeFile(this.config.GetActivityFileLocation(), JSON.stringify(currentQueue), { encoding: "utf8", flag: "w" });
+            if (currentQueue.length >= MAX_ACTIVITIES_BEFORE_SEND) {
+                let time: number = Date.now();
+                if (this.enoughTimePassed(time)) {
+                    this.messageBroker.invokeEvent(EventType.QUEUE_MIN_LIMIT_REACHED);
+                    this.lastTrackedActivity = time;
+                }
+            }
             return true;
         } catch (err) {
+            logError("Can't push activities: " + err);
             return false;
         }
+    }
+
+    private enoughTimePassed(time: number): boolean {
+        return this.lastTrackedActivity + 1000 * 60 < time;
     }
 
     async pushActivitiesToQueue(activity: Array<ActivityEntity>): Promise<boolean> {
@@ -55,7 +66,7 @@ export class FileBasedQueueService implements IQueueService {
                 currentQueue.push(oneActivity);
             }
             var json = JSON.stringify(activity);
-            await fsPromises.writeFile(this.config.GetActivityFileLocation(), json, { encoding: "utf8" });
+            await fsPromises.writeFile(this.config.GetActivityFileLocation(), json, { encoding: "utf8", flag: "w" });
             return true;
         } catch (err) {
             logError("Write failed: " + err);
@@ -82,10 +93,10 @@ export class FileBasedQueueService implements IQueueService {
     async initQueue(): Promise<boolean> {
         return new Promise((resolve, reject) => {
             try {
-                fs.exists(this.config.GetActivityFileLocation(), async (exist) => {
-                    var needToRewrite = !exist;
+                fs.access(this.config.GetActivityFileLocation(), fs.constants.F_OK | fs.constants.W_OK, async (error) => {
+                    var needToRewrite = error != null;
 
-                    if (exist) {
+                    if (error == null) {
                         let queuesRaw = await fsPromises.readFile(this.config.GetActivityFileLocation(), { encoding: "utf8" });
                         if (queuesRaw == null || queuesRaw == "")
                             needToRewrite = true
@@ -102,7 +113,7 @@ export class FileBasedQueueService implements IQueueService {
                     }
 
                     if (needToRewrite) {
-                        fs.writeFile(this.config.GetActivityFileLocation(), "", 'utf8', (err) => {
+                        fs.writeFile(this.config.GetActivityFileLocation(), "",  {encoding: 'utf8', flag: "w"}, (err) => {
                             if (err == null) {
                                 return resolve(true);
                             }

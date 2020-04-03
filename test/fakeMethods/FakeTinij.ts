@@ -10,22 +10,36 @@ import {FormatterService} from "../../src/services/fomatterService/FormatterServ
 import {FakeApiService} from "./FakeApiService";
 import { BaseProjectService } from "../../src/services/projects/BaseProjectService";
 import { QueueFactory } from "../../src/services/queue/QueueFactory";
+import { isBoolean } from "util";
+import { ActivityApi } from "../../src/api/implementation/ActivityApi";
+import { FakeBrokerService } from "./FakeBrokerService";
 
 export class FakeTinij extends Tinij{
 
-    constructor() {
+    private _isRealAPI: boolean;
+
+    constructor(isRealApi: boolean) {
         super("testKey");
         super.isInit = true;
+        this._isRealAPI = isRealApi;
     }
 
 
     public async initServices() : Promise<boolean> {
         await this.initMainModules();
-        this.simpleMessageBroker = new SimpleMessageBroker();
+        if (this._isRealAPI) {
+            this.simpleMessageBroker = new SimpleMessageBroker();
+        } else {
+            this.simpleMessageBroker = new FakeBrokerService();
+        }
         var factory = new QueueFactory(this.simpleMessageBroker);
 
         this.languageDetector = new DetectLanguageService();
-        this.activityApi = new FakeApiService();
+        if (this._isRealAPI) {
+            this.activityApi = new ActivityApi();
+        } else {
+            this.activityApi = new FakeApiService();
+        }
         this.validationService = new Validator();
         this.fileService = new FileService();
         this.machineInfoService = new MachineInfoService();

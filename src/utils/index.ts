@@ -6,7 +6,7 @@ var logFile : fs.WriteStream;
 var logLevel: number;
 
 export async function InitLogService() : Promise<boolean> {
-    logFile = fs.createWriteStream(ConfigService.getInstance().GetLogFileLocation(), {flags : 'a'});
+    logFile = fs.createWriteStream(ConfigService.getInstance().GetLogFileLocation(), {flags : 'w', encoding: "utf8"});
     this.logLevel = await ConfigService.getInstance().GetDebugLevel();
     return true;
 }

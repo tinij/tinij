@@ -12,12 +12,13 @@ import { PluginTypeEnum } from '../src/enums/PluginTypeEnum';
 import { PlatformTypeEnum } from '../src/enums/PlatformTypeEnum';
 import { promises as fsPromises } from 'fs';
 import fs from 'fs';
+import { EventType } from '../src/services/messageBroker/IMessageBroker';
+import { FakeBrokerService } from './fakeMethods/FakeBrokerService';
 
 describe('Base test',
     () => {
         it('should return true', async () => {
-            const tinij = new Tinij("test");
-            await tinij.initServices();
+            let tinij = await generateTinijTestInstance(0);
             assert.isNotNull(tinij);
         });
 });
@@ -25,8 +26,7 @@ describe('Base test',
 describe('Language test',
     () => {
         it('should return JS', async () => {
-            const tinij = new Tinij("test api");
-            await tinij.initServices();
+            let tinij = await generateTinijTestInstance(0);
             let language = tinij.languageDetector.detectLanguageByFileName("alex.js");
             assert.equal(language, "JavaScript");
         });
@@ -108,11 +108,26 @@ describe('Activity track test',
 describe('Activity queue test',
     () => {
         it('should have one activity created and removed', async () => {
+            console.log("START");
+            let tinij = await generateTinijTestInstance(1);
+            let popedQueueItems = await tinij.queueService.popActiveActivities();
+            assert.equal(popedQueueItems.length, 1, "Queue should have tracked activity item");
+            let empty = await tinij.queueService.getActiveActivities();
+            assert.equal(empty.length, 0, "Queue should not have tracked activity item - because they was removed earlier");
 
+        });
+
+        it('pop and push tests', async () => {
+            console.log("START");
             let tinij = await generateTinijTestInstance(1);
             let popedQueueItems = await tinij.queueService.popActiveActivities();
             assert.equal(popedQueueItems.length, 1, "Queue should have tracked activity item");
 
+            await tinij.queueService.pushActivitiesToQueue(popedQueueItems);
+            var updated = await tinij.queueService.getActiveActivities();
+            assert.equal(updated.length, 1, "Queue should have tracked activity item");
+
+            await tinij.queueService.popActiveActivities();
             let empty = await tinij.queueService.getActiveActivities();
             assert.equal(empty.length, 0, "Queue should not have tracked activity item - because they was removed earlier");
         });
@@ -121,11 +136,15 @@ describe('Activity queue test',
 describe('Broker event test',
     () => {
         it('should try to send activities to backend', async () => {
-            const tinijFake = new FakeTinij();
+            const tinijFake = new FakeTinij(false);
             const activitiesRecorded = MAX_ACTIVITIES_BEFORE_SEND;
             let tinij = await generateTinijTestInstance(activitiesRecorded, tinijFake);
             let activityApi = tinij.activityApi as FakeApiService;
-            assert.equal(activityApi.isInvoked, true, "Should trying to send activities");
+            let broker = tinij.simpleMessageBroker as FakeBrokerService;
+
+            assert.equal(broker.invokedEvent, true, "[broker]Should trying to send activities");
+
+            assert.equal(activityApi.isInvoked, true, "[api]Should trying to send activities");
             assert.equal(activityApi.countOfTrackedActivities, activitiesRecorded, "Should send all activities");
 
             let empty = await tinij.queueService.getActiveActivities();
@@ -146,7 +165,7 @@ describe('Machine info test',
 describe('Git info test',
     () => {
         it('should return current branch', async () => {
-            let tinij = await generateTinijTestInstance(1);
+            let tinij = await generateTinijTestInstance(1, undefined, true);
             let popedQueueItems = await tinij.queueService.popActiveActivities();
             assert.equal(popedQueueItems.length, 1, "Queue should have tracked activity item");
             let createdObject = popedQueueItems[0];
@@ -191,22 +210,24 @@ describe('HTTP request test',
 });
 
 
-async function generateTinijTestInstance(countOfActivities: number, customTinij?: Tinij) : Promise<Tinij> {
+async function generateTinijTestInstance(countOfActivities: number, customTinij?: FakeTinij, ignoreBranch?: boolean) : Promise<Tinij> {
     let pluginName = PluginTypeEnum.VSCODE;
-    let entity = "/Users/alexlobanov/Projects/tinij project/tinij-base/test/test.ts";
+    let entity = "/Users/alexlobanov/Projects/tinij-project/tinij-base/test/fakeMethods/FakeApiService.ts";
     let category = CategoryEnum.CODING;
     let writeOperation = false;
     let project = "testProject";
     let branch = "testBranch";
+    if (ignoreBranch) {
+        branch = undefined;
+    }
     let lineNumber = 5;
 
-    let tinij = new Tinij("test");
+    let tinij = new FakeTinij(false);
     if (customTinij != null) {
         tinij = customTinij;
     }
     await tinij.initServices();
     await tinij.clearStoredCache();
-
     if (countOfActivities != 0) {
         for (let i = 0; i < countOfActivities; i++) {
             await tinij.trackActivity(
@@ -220,7 +241,7 @@ async function generateTinijTestInstance(countOfActivities: number, customTinij?
                 i);
         }
         await new Promise(resolve =>
-            setTimeout(resolve, 5) // allow time to cleanup
+            setTimeout(resolve, 10) // allow time to cleanup
         );
     }
     return tinij;

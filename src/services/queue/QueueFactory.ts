@@ -14,7 +14,7 @@ export class QueueFactory {
     private readonly config: ConfigService;
 
     constructor(messageBroker: IMessageBroker) {
-        this.fileBasedQueue = new FileBasedQueueService(messageBroker);
+        this.fileBasedQueue = new LockProtectedFileBasedQueueService(messageBroker);
         this.memoryBasedQueue = new QueueService(messageBroker);
         this.config = ConfigService.getInstance();
     }
@@ -29,9 +29,9 @@ export class QueueFactory {
     private initFileSystem() : Promise<boolean> {
         return new Promise((resolve, reject) => {
             try {
-                fs.exists(this.config.GetActivityFileLocation(), (exist) => {
-                    if (!exist) {
-                        fs.writeFile(this.config.GetActivityFileLocation(), "", 'utf8', (err) => {
+                fs.access(this.config.GetActivityFileLocation(), fs.constants.F_OK | fs.constants.W_OK, async (error) => {
+                    if (error != null) {
+                        fs.writeFile(this.config.GetActivityFileLocation(), "", { encoding: 'utf8', flag: "w" }, (err) => {
                             if (err == null) {
                                 return resolve (true)
                             } else {
