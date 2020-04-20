@@ -1,6 +1,8 @@
 export * from './api/IActivityApi';
 export * from './constants/';
 
+export * from './tinij';
+
 export * from './entities/ActivityEntity';
 export * from './entities/UserInfoEntity';
 
