@@ -162,6 +162,18 @@ describe('Machine info test',
         });
 });
 
+describe('Settings write test',
+    () => {
+        it('should return current new API url', async () => {
+            let tinij = await generateTinijTestInstance(0);
+            let config = tinij.getConfig();
+            let newUrl = "https://tinij.api.com/test";
+            config.SetTrackActivityUrl(newUrl);
+            let url = await config.GetTrackActivityUrl();
+            assert.equal(url, newUrl, "URL should be new one");
+        });
+});
+
 describe('Git info test',
     () => {
         it('should return current branch', async () => {

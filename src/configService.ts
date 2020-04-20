@@ -42,9 +42,14 @@ export class ConfigService {
     }
 
 
+
     public GetTrackActivityUrl() : Promise<string>
     {
         return this.optionsService.getOption("trackActivityURL");
+    }
+
+    public SetTrackActivityUrl(url: string) : void {
+        this.optionsService.setOption("trackActivityURL", url);
     }
 
     public async GetDebugLevel() : Promise<number> {

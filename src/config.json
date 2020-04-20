@@ -1,5 +1,5 @@
 {
-  "trackActivityURL" : "http://localhost:3501/activity/bulk",
+  "trackActivityURL" : "https://api.tinij.com/v1/collector/activity/bulk",
   "activityLogFile" : ".tinij_log.json",
   "logFile" : ".tinij.log",
   "settingsFile" : ".tinij_settings.json",
