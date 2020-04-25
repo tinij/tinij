@@ -41,12 +41,7 @@ export class Tinij {
     formattedService: IFormatterService;
     projectService: IProjectService;
 
-    constructor(apiKey: string) {
-        if (apiKey == null)
-        {
-            console.error("[TINI] NO API KEY FOUND! Exit");
-            return;
-        }
+    constructor(apiKey: string | undefined) {
         this._apiKey = apiKey;
     }
 
@@ -75,7 +70,7 @@ export class Tinij {
             await this.queueService.initQueue();
             this.initModules();
             this.isInit = true;
-
+            
             return true;
         } catch (err) {
             logError("Failed:" + err);
@@ -154,5 +149,19 @@ export class Tinij {
         } else {
             return HeartbeatsTypeEnum.File;
         }
+    }
+
+    public async isApiKeyExist() : Promise<boolean> {
+        var config = ConfigService.getInstance();
+        var key = await config.GetApiKey();
+        if (key == null || key == undefined || key === "" || key.startsWith("xxxx-")) {
+            return false;
+        } 
+        return true;
+    }
+
+    public async setApiKey(token: string) {
+        var config = ConfigService.getInstance();
+        config.SetUserToken(token);
     }
 }
