@@ -1,6 +1,6 @@
 {
   "name": "tinij-base",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "tinij base package",
   "main": "dist/index.js",
   "types" : "dist/index.d.ts",

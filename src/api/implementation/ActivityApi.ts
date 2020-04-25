@@ -45,6 +45,7 @@ export class ActivityApi implements IActivityApi{
         }
         catch (e) {
          logDetail("Request failed: " + e?.errno);
+         logDetail(e);
          return ResponseResultEnum.FAILED;
         }
     }
