@@ -50,7 +50,7 @@ export class FileOptionsStorage implements IOptionsStorage {
         }
     }
 
-    async initService(path: string): Promise<boolean> {
+    async initService(path: string, force: boolean): Promise<boolean> {
         this.path = path;
         return new Promise((resolve, reject) => {
             try {
@@ -72,9 +72,8 @@ export class FileOptionsStorage implements IOptionsStorage {
                         }
                     }
 
-                    if (needToRewrite) {
+                    if (needToRewrite || force) {
                         var configParsed = await fsPromises.readFile(require.resolve("../../config.json"));
-                        console.log(configParsed);
                         fs.writeFile(path, configParsed, 'utf8', (err) => {
                             if (err == null) {
                                 return resolve(true);

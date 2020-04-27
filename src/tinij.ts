@@ -9,7 +9,7 @@ import {ActivityEntity} from "./entities/ActivityEntity";
 import {HeartbeatsTypeEnum} from "./enums/HeartbeatsTypeEnum";
 import {IFileService} from "./services/fileService/IFileService";
 import {FileService} from "./services/fileService/FileService";
-import {logError, logInfo, InitLogService} from "./utils";
+import {logError, logInfo, InitLogService, logDetail} from "./utils";
 import {SimpleMessageBroker} from "./services/messageBroker/SimpleMessageBroker";
 import {IMessageBroker, EventType} from "./services/messageBroker/IMessageBroker";
 import {IQueueProcessingService} from "./services/queueProcessing/IQueueProcessingService";
@@ -76,12 +76,6 @@ export class Tinij {
             logError("Failed:" + err);
             return false;
         }
-    }
-
-    public async clearStoredCache() : Promise<boolean> {
-        let objects = await this.queueService.popActiveActivities();
-        objects = null;
-        return true;
     }
 
     protected async initMainModules() : Promise<boolean> {
@@ -163,5 +157,17 @@ export class Tinij {
     public async setApiKey(token: string) {
         var config = ConfigService.getInstance();
         config.SetUserToken(token);
+    }
+
+    public resetSettingsToDefault() : Promise<boolean> {
+        var config = ConfigService.getInstance();
+        return config.ResetSettingsToDefault();
+    }
+
+    public async clearRecordedLogs() : Promise<boolean> {
+        var logs = await this.queueService.popActiveActivities();
+        if (logs == null)
+            return false;
+        return true;
     }
 }

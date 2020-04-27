@@ -79,7 +79,7 @@ describe('Activity track test',
 
             const tinij = new Tinij("testKey");
             await tinij.initServices();
-            await tinij.clearStoredCache();
+            await tinij.clearRecordedLogs();
             await tinij.trackActivity(
                 pluginName,
                 new Date(),
@@ -167,10 +167,23 @@ describe('Settings write test',
         it('should return current new API url', async () => {
             let tinij = await generateTinijTestInstance(0);
             let config = tinij.getConfig();
-            let newUrl = "https://tinij.api.com/test";
+            let newUrl = "https://tinij.2.com/test";
             config.SetTrackActivityUrl(newUrl);
             let url = await config.GetTrackActivityUrl();
             assert.equal(url, newUrl, "URL should be new one");
+        });
+});
+
+describe('Api Token Test',
+    () => {
+        it('Should return new api token key', async () => {
+            let tinij = await generateTinijTestInstance(0);
+            let newKey = "29df8b6f-cb4e-410e-9c64-e16df1262f22" + Date.now()
+            tinij.setApiKey(newKey);
+            assert.equal(await tinij.isApiKeyExist(), true);
+
+            let config = tinij.getConfig();
+            assert.equal(await config.GetApiKey(), newKey);
         });
 });
 
@@ -222,6 +235,26 @@ describe('HTTP request test',
 });
 
 
+describe('Reset to default tests',
+    () => {
+        it('should clear recorded logs to default', async () => {
+            let tinij = await generateTinijTestInstance(10);
+            let result = await tinij.clearRecordedLogs();
+            assert.equal(result, true);
+
+            let queueItems = await tinij.queueService.getActiveActivities();
+            assert.equal(queueItems == null || queueItems.length == 0, true);
+        });
+
+        it('should reset settings to default', async () => {
+            let tinij = await generateTinijTestInstance(0);
+            let result = await tinij.resetSettingsToDefault();
+
+            assert.equal(result, true);
+        });
+});
+
+
 async function generateTinijTestInstance(countOfActivities: number, customTinij?: FakeTinij, ignoreBranch?: boolean) : Promise<Tinij> {
     let pluginName = PluginTypeEnum.VSCODE;
     let entity = "/Users/alexlobanov/Projects/tinij-project/tinij-base/test/fakeMethods/FakeApiService.ts";
@@ -239,7 +272,7 @@ async function generateTinijTestInstance(countOfActivities: number, customTinij?
         tinij = customTinij;
     }
     await tinij.initServices();
-    await tinij.clearStoredCache();
+    await tinij.clearRecordedLogs();
     if (countOfActivities != 0) {
         for (let i = 0; i < countOfActivities; i++) {
             await tinij.trackActivity(

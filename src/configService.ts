@@ -26,7 +26,7 @@ export class ConfigService {
     }
 
     public InitSettingsStorage() : Promise<boolean> {
-        return this.optionsService.initService(path.join(this.getHomeLocation(),  config.settingsFile));
+        return this.optionsService.initService(path.join(this.getHomeLocation(),  config.settingsFile), false);
     }
 
     public GetConfigLocation() : string {
@@ -83,6 +83,10 @@ export class ConfigService {
 
     public async GetApiKey() : Promise<string> {
         return await this.optionsService.getOption("apiKey");
+    }
+
+    public ResetSettingsToDefault() : Promise<boolean> {
+        return this.optionsService.initService(path.join(this.getHomeLocation(),  config.settingsFile), true);
     }
 
     private getHomeLocation() : string {
