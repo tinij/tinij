@@ -74,7 +74,8 @@ export class FileOptionsStorage implements IOptionsStorage {
 
                     if (needToRewrite || force) {
                         var configParsed = await fsPromises.readFile(require.resolve("../../config.json"));
-                        fs.writeFile(path, configParsed, 'utf8', (err) => {
+                        fs.writeFile(path, configParsed, { encoding: 'utf8', flag: "w" }, (err) => {
+                            this.memCache = {};
                             if (err == null) {
                                 return resolve(true);
                             }
@@ -83,8 +84,9 @@ export class FileOptionsStorage implements IOptionsStorage {
                                 return resolve (false)
                             }
                         });
+                    } else {
+                        return resolve(true);
                     }
-                    return resolve(true);
                 });
             } catch (err) {
                 logError("Exception during file init: " + err);

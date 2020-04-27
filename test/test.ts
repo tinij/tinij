@@ -172,6 +172,20 @@ describe('Settings write test',
             let url = await config.GetTrackActivityUrl();
             assert.equal(url, newUrl, "URL should be new one");
         });
+
+        it('should return found new ApiToken', async () => {
+            let tinij = await generateTinijTestInstance(0);
+            await tinij.resetSettingsToDefault();
+
+            let config = tinij.getConfig();
+
+            console.log("APIKEY: " + await config.GetApiKey());
+
+            assert.isNotTrue(await tinij.isApiKeyExist());
+            
+            await tinij.setApiKey("test");
+            assert.isTrue(await tinij.isApiKeyExist());
+        });
 });
 
 describe('Api Token Test',
