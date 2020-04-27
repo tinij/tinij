@@ -28,7 +28,7 @@ import { QueueFactory } from "./services/queue/QueueFactory";
 export class Tinij {
 
     public isInit = false;
-    protected _apiKey = "";
+    protected _storedApiKey = "";
 
     languageDetector: IDetectLanguageService;
     activityApi: IActivityApi;
@@ -41,8 +41,8 @@ export class Tinij {
     formattedService: IFormatterService;
     projectService: IProjectService;
 
-    constructor(apiKey: string | undefined) {
-        this._apiKey = apiKey;
+    constructor(apiKey?: string) {
+        this._storedApiKey = apiKey;
     }
 
 
@@ -80,7 +80,9 @@ export class Tinij {
 
     protected async initMainModules() : Promise<boolean> {
         await this.getConfig().InitSettingsStorage();
-        await ConfigService.getInstance().SetUserToken(this._apiKey);
+        if (this._storedApiKey != null && this._storedApiKey != "") {
+            await ConfigService.getInstance().SetUserToken(this._storedApiKey);
+        }
         InitLogService();
         return true;
     }
