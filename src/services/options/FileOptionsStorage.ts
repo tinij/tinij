@@ -19,7 +19,7 @@ export class FileOptionsStorage implements IOptionsStorage {
         this.memCache[key] = value;
         try {
             let config = await fsPromises.readFile(this.path, { encoding: "utf8" });
-            let parsedConfig: {[k: string]: any} = {};
+            let parsedConfig: any = {};
             if (config != null) {
                 parsedConfig = JSON.parse(config);
             }

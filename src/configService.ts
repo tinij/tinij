@@ -48,8 +48,8 @@ export class ConfigService {
         return this.optionsService.getOption("trackActivityURL");
     }
 
-    public SetTrackActivityUrl(url: string) : void {
-        this.optionsService.setOption("trackActivityURL", url);
+    public SetTrackActivityUrl(url: string) : Promise<boolean> {
+        return this.optionsService.setOption("trackActivityURL", url);
     }
 
     public async GetDebugLevel() : Promise<number> {
@@ -65,10 +65,10 @@ export class ConfigService {
         return (await this.optionsService.getOption("memoryBasedQueue")) == "true";
     }
 
-    public SetUserToken(key: string) : void {
+    public SetUserToken(key: string) : Promise<boolean> {
         this.userInfo = new UserInfoEntity();
         this.userInfo.apiKey = key;
-        this.optionsService.setOption("apiKey", key);
+        return this.optionsService.setOption("apiKey", key);
     }
 
     public GetUserAgent() {

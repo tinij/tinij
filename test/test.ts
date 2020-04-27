@@ -168,7 +168,7 @@ describe('Settings write test',
             let tinij = await generateTinijTestInstance(0);
             let config = tinij.getConfig();
             let newUrl = "https://tinij.2.com/test";
-            config.SetTrackActivityUrl(newUrl);
+            await config.SetTrackActivityUrl(newUrl);
             let url = await config.GetTrackActivityUrl();
             assert.equal(url, newUrl, "URL should be new one");
         });
@@ -179,7 +179,7 @@ describe('Api Token Test',
         it('Should return new api token key', async () => {
             let tinij = await generateTinijTestInstance(0);
             let newKey = "29df8b6f-cb4e-410e-9c64-e16df1262f22" + Date.now()
-            tinij.setApiKey(newKey);
+            await tinij.setApiKey(newKey);
             assert.equal(await tinij.isApiKeyExist(), true);
 
             let config = tinij.getConfig();

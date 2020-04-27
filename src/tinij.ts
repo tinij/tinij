@@ -80,7 +80,7 @@ export class Tinij {
 
     protected async initMainModules() : Promise<boolean> {
         await this.getConfig().InitSettingsStorage();
-        ConfigService.getInstance().SetUserToken(this._apiKey);
+        await ConfigService.getInstance().SetUserToken(this._apiKey);
         InitLogService();
         return true;
     }
@@ -154,9 +154,9 @@ export class Tinij {
         return true;
     }
 
-    public async setApiKey(token: string) {
+    public async setApiKey(token: string) : Promise<boolean> {
         var config = ConfigService.getInstance();
-        config.SetUserToken(token);
+        return config.SetUserToken(token);
     }
 
     public resetSettingsToDefault() : Promise<boolean> {
