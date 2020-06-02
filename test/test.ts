@@ -2,20 +2,16 @@ import { Tinij } from '../src';
 import 'mocha';
 import {describe} from "mocha";
 import { assert } from "chai";
-import {ActivityEntity} from "../src/entities/ActivityEntity";
-import {HeartbeatsTypeEnum} from "../src/enums/HeartbeatsTypeEnum";
-import {CategoryEnum} from "../src/enums/CategoryEnum";
+import {CategoryEnum} from "../src";
 import {FakeTinij} from "./fakeMethods/FakeTinij";
 import {FakeApiService} from "./fakeMethods/FakeApiService";
 import {MAX_ACTIVITIES_BEFORE_SEND} from "../src/constants";
-import { PluginTypeEnum } from '../src/enums/PluginTypeEnum';
-import { PlatformTypeEnum } from '../src/enums/PlatformTypeEnum';
+import { PluginTypeEnum } from '../src';
 import { promises as fsPromises } from 'fs';
-import fs from 'fs';
-import { EventType } from '../src/services/messageBroker/IMessageBroker';
 import { FakeBrokerService } from './fakeMethods/FakeBrokerService';
+import {generateTinijTestInstance} from "./utils";
 
-describe('Base test',
+describe('Base Init Test',
     () => {
         it('should return true', async () => {
             let tinij = await generateTinijTestInstance(0);
@@ -23,47 +19,6 @@ describe('Base test',
         });
 });
 
-describe('Language test',
-    () => {
-        it('should return JS', async () => {
-            let tinij = await generateTinijTestInstance(0);
-            let language = tinij.languageDetector.detectLanguageByFileName("alex.js");
-            assert.equal(language, "JavaScript");
-        });
-});
-
-describe('Validation test',
-    () => {
-        it('should return false for empty activity', async () => {
-            let tinij = await generateTinijTestInstance(0);
-
-            let activity = new ActivityEntity();
-            activity.time = new Date();
-
-            let pluginName = PluginTypeEnum.VSCODE;
-            let entity = "test.ts";
-            let category = CategoryEnum.CODING;
-            let project = "testProject";
-            let branch = "testBranch";
-            let lineNumber = 5;
-
-            activity.time = new Date();
-            activity.system = PlatformTypeEnum.MacOS;
-            activity.machine = "testExecutor";
-            activity.plugin = pluginName;
-            activity.entity = entity;
-            activity.category = category;
-            activity.is_write = false;
-            activity.project = project;
-            activity.branch = branch;
-            activity.lineno = lineNumber;
-            activity.type = HeartbeatsTypeEnum.File;
-
-            let validActivity = await tinij.validationService.validateActivityEntity(activity);
-
-            assert.equal(validActivity, true);
-        });
-});
 
 describe('Activity track test',
     () => {
@@ -182,7 +137,7 @@ describe('Settings write test',
             console.log("APIKEY: " + await config.GetApiKey());
 
             assert.isNotTrue(await tinij.isApiKeyExist());
-            
+
             await tinij.setApiKey("test");
             assert.isTrue(await tinij.isApiKeyExist());
         });
@@ -267,41 +222,3 @@ describe('Reset to default tests',
             assert.equal(result, true);
         });
 });
-
-
-async function generateTinijTestInstance(countOfActivities: number, customTinij?: FakeTinij, ignoreBranch?: boolean) : Promise<Tinij> {
-    let pluginName = PluginTypeEnum.VSCODE;
-    let entity = "/Users/alexlobanov/Projects/tinij-project/tinij-base/test/fakeMethods/FakeApiService.ts";
-    let category = CategoryEnum.CODING;
-    let writeOperation = false;
-    let project = "testProject";
-    let branch = "testBranch";
-    if (ignoreBranch) {
-        branch = undefined;
-    }
-    let lineNumber = 5;
-
-    let tinij = new FakeTinij(false);
-    if (customTinij != null) {
-        tinij = customTinij;
-    }
-    await tinij.initServices();
-    await tinij.clearRecordedLogs();
-    if (countOfActivities != 0) {
-        for (let i = 0; i < countOfActivities; i++) {
-            await tinij.trackActivity(
-                pluginName,
-                new Date(),
-                entity,
-                category,
-                writeOperation,
-                project,
-                branch,
-                i);
-        }
-        await new Promise(resolve =>
-            setTimeout(resolve, 10) // allow time to cleanup
-        );
-    }
-    return tinij;
-}

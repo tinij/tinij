@@ -24,7 +24,6 @@ export class FakeTinij extends Tinij{
         this._isRealAPI = isRealApi;
     }
 
-
     public async initServices() : Promise<boolean> {
         await this.initMainModules();
         if (this._isRealAPI) {
