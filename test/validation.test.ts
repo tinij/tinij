@@ -34,4 +34,14 @@ describe('Validation test',
 
             assert.equal(validActivity, true);
         });
+
+        it('should have one created activity with unix date', async () => {
+            let tinij = await generateTinijTestInstance(0);
+
+            await tinij.trackActivity(0, 1591171977725, "alex.cs");
+
+            let queueContainsElements = await tinij.queueService.getActiveActivities();
+
+            assert.equal(queueContainsElements.length, 1);
+        });
     });

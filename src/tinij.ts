@@ -70,7 +70,7 @@ export class Tinij {
             await this.queueService.initQueue();
             this.initModules();
             this.isInit = true;
-            
+
             return true;
         } catch (err) {
             logError("Failed:" + err);
@@ -101,7 +101,7 @@ export class Tinij {
         project?: string,
         branch?: string,
         lineNumber?: number,
-        type?: number,
+        type?: number
     ) {
         if (!this.isInit)
         {
@@ -152,7 +152,7 @@ export class Tinij {
         var key = await config.GetApiKey();
         if (key == null || key == undefined || key === "" || key.startsWith("xxxx-")) {
             return false;
-        } 
+        }
         return true;
     }
 
